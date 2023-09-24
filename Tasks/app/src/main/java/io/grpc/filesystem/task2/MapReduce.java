@@ -66,6 +66,28 @@ public class MapReduce {
          * Save the map output in a file named "map-chunk001", for example, in folder
          * path input/temp/map
          */
+        File inputFile = new File(inputfilepath);
+        // create tempmap folder
+        String tempMapFolder = inputFile.getParentFile().getParent() + "/temp/map";
+        new File(tempMapFolder).mkdirs();
+        String tempMapFileName = "map-" + inputFile.getName();
+        File tempMapFile = new File(tempMapFolder, tempMapFileName);
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+             BufferedWriter writer = new BufferedWriter(new FileWriter(tempMapFile))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // split line into words
+                String[] words = line.split("\\s+"); // \\s+ --> regex for all whitespaces
+                for (String word : words) {
+                    // remove punctuation and convert to lowercase
+                    word = word.replaceAll("\\p{Punct}", " ").toLowerCase();
+                    if (word.matches("^[a-zA-Z0-9]*$") && !word.isEmpty()) {
+                        writer.write(word + ":1\n");
+                    }
+                }
+            }
+        }
 
     }
 
@@ -83,6 +105,29 @@ public class MapReduce {
          * unique words with their counts as "the:64", for example.
          * Save the output of reduce function as output-task2.txt
          */
+        Map<String, Integer> wordCounts = new HashMap<>();
+        File inputFolder = new File(inputfilepath + "/map");
+
+        for (File file : inputFolder.listFiles()) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String[] parts = line.split(":");
+                    String word = parts[0];
+                    int count = Integer.parseInt(parts[1]);
+                    wordCounts.put(word, wordCounts.getOrDefault(word, 1) + count);
+                }
+            }
+        }
+
+        List<Entry<String, Integer>> sortedEntries = new ArrayList<>(wordCounts.entrySet());
+        sortedEntries.sort(Entry.<String, Integer>comparingByValue().reversed());
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputfilepath))) {
+            for (Entry<String, Integer> entry : sortedEntries) {
+                writer.write(entry.getKey() + ":" + entry.getValue() + "\n");
+            }
+        }
 
     }
 
