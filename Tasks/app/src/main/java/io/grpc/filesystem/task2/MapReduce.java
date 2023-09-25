@@ -81,9 +81,11 @@ public class MapReduce {
                 String[] words = line.split("\\s+"); // \\s+ --> regex for all whitespaces
                 for (String word : words) {
                     // remove punctuation and convert to lowercase
-                    word = word.replaceAll("\\p{Punct}", " ").toLowerCase();
+                    word = word.replaceAll("\\p{Punct}", "").toLowerCase();
                     if (word.matches("^[a-zA-Z0-9]*$") && !word.isEmpty()) {
                         writer.write(word + ":1\n");
+                    } else {
+                        System.out.println(word);
                     }
                 }
             }
