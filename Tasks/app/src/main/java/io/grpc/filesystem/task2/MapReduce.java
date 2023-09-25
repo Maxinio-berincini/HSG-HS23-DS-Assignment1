@@ -115,7 +115,7 @@ public class MapReduce {
                     String[] parts = line.split(":");
                     String word = parts[0];
                     int count = Integer.parseInt(parts[1]);
-                    wordCounts.put(word, wordCounts.getOrDefault(word, 1) + count);
+                    wordCounts.put(word, wordCounts.getOrDefault(word, 0) + count);
                 }
             }
         }
