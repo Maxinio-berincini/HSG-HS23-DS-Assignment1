@@ -43,12 +43,14 @@ public class MrReduceServer {
         @Override
         public void reduce(ReduceInput request, StreamObserver<ReduceOutput> responseObserver) {
             try {
+                System.out.println(request.getInputfilepath());
+                System.out.println(request.getOutputfilepath());
                 mr.reduce(request.getInputfilepath(), request.getOutputfilepath());
 
-                ReduceOutput response = ReduceOutput.newBuilder().setJobstatus(2).build();
+                ReduceOutput response = ReduceOutput.newBuilder().setJobstatus(Integer.parseInt(request.getOutputfilepath().substring(10))).build();
                 responseObserver.onNext(response);
             } catch (Exception e) {
-                ReduceOutput response = ReduceOutput.newBuilder().setJobstatus(1).build();
+                ReduceOutput response = ReduceOutput.newBuilder().setJobstatus(-1).build();
                 responseObserver.onNext(response);
             }
             responseObserver.onCompleted();

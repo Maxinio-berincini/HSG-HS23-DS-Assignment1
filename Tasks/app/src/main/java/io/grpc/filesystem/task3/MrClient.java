@@ -9,11 +9,8 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -27,30 +24,57 @@ import io.grpc.filesystem.task2.*;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.util.stream.Stream;
 
 public class MrClient {
    Map<String, Integer> jobStatus = new HashMap<String, Integer>();
 
    public void requestMap(String ip, Integer portnumber, String inputfilepath, String outputfilepath) throws InterruptedException {
-      
-      /* 
-      * Insert your code here 
-      * Create a stub for calling map function from the server
-      * Remember that the map function uses client stream
-      * Update the job status every time the map function finishes mapping a chunk, it is useful for calling reduce function once all of the chunks are processed by the map function
-      */
+      ManagedChannel channel = ManagedChannelBuilder.forAddress(ip, portnumber).usePlaintext().build();
 
+      AssignJobGrpc.AssignJobStub stub = AssignJobGrpc.newStub(channel);
+
+      StreamObserver<MapInput> mapInputObserver = stub.map(new StreamObserver<MapOutput>() {
+         @Override
+         public void onNext(MapOutput value) {
+            System.out.println("MapStatus: " + Integer.toString(value.getJobstatus()));
+            if (value.getJobstatus() != -1) {
+               jobStatus.put("chunk" + Integer.toString(value.getJobstatus()) + ".txt", 2);
+            }
+         }
+
+         @Override
+         public void onError(Throwable t) {
+        System.err.println("Error received from server: " + t.getMessage());
+         }
+
+         @Override
+         public void onCompleted() {
+            channel.shutdown();
+         }
+      });
+
+      // Read files in /temp/ and send MapInput messages
+      System.out.println(outputfilepath);
+      File tempDir = new File(outputfilepath);
+      for (File file : tempDir.listFiles()) {
+          String inputFilePath = file.getAbsolutePath();
+          MapInput mapInput = MapInput.newBuilder()
+              .setInputfilepath(inputFilePath)
+              .build();
+          System.out.println("MapProcessing: " + file.getName());
+          mapInputObserver.onNext(mapInput);
+      }
+      mapInputObserver.onCompleted();
    }
 
    public int requestReduce(String ip, Integer portnumber, String inputfilepath, String outputfilepath) {
        
-      /* 
-      * Insert your code here 
-      * Create a stub for calling reduce function from the server
-      * Remember that the map function uses unary call
-      */
+      ManagedChannel channel = ManagedChannelBuilder.forAddress(ip, portnumber).usePlaintext().build();
 
-      return 0; // update this return statement
+      AssignJobGrpc.AssignJobBlockingStub stub = AssignJobGrpc.newBlockingStub(channel);
+
+      return stub.reduce(ReduceInput.newBuilder().setInputfilepath(inputfilepath).setOutputfilepath(outputfilepath).build()).getJobstatus();
    }
    public static void main(String[] args) throws Exception {// update main function if required
 
@@ -78,7 +102,7 @@ public class MrClient {
 
          }
       }
-      client.requestMap(ip, mapport, inputfilepath, outputfilepath);
+      client.requestMap(ip, mapport, inputfilepath, chunkpath);
 
       Set<Integer> values = new HashSet<Integer>(client.jobStatus.values());
       if (values.size() == 1 && client.jobStatus.containsValue(2)) {
