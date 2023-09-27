@@ -47,12 +47,19 @@ public class MrMapServer {
             return new StreamObserver<MapInput> () {
                 @Override
                 public void onNext(MapInput request) {
-                    responseObserver.onNext(MapOutput.newBuilder().setJobstatus(2).build());
+                    String chunkPath = request.getChunkPath();
+                    try {
+                        MapReduce.map(chunkPath);
+                        responseObserver.onNext(MapOutput.newBuilder().setJobstatus(2).build());
+                    } catch (IOException e) {
+                        System.err.println("Error during map operation: " + e.getMessage());
+                        responseObserver.onNext(MapOutput.newBuilder().setJobstatus(1).build());
+                    }
                 }
                 @Override
                 public void onError(Throwable t) {
                     responseObserver.onError(MapOutput.newBuilder().setJobstatus(1).build());
-                    System.out.println("Error" + t.getMessage());
+                    System.out.println("Error onError: " + t.getMessage());
 
                 }
                 @Override
