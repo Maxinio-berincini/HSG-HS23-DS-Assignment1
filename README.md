@@ -105,7 +105,7 @@ Check your output:
 Map Server:
 
 ```bash
-.\gradlew run run -PchooseMain="io.grpc.filesystem.task3.MrMapServer"" --args="50551"
+.\gradlew run -PchooseMain="io.grpc.filesystem.task3.MrMapServer" --args="50551"
 ```
 
 Reduce Server:

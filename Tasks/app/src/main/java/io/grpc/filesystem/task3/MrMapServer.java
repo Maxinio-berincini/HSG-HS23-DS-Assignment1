@@ -1,11 +1,6 @@
 
 /* 
 * gRPC server node to accept calls from the clients and serve based on the method that has been requested
-* To build the project:
-* ./gradlew init
-* ./gradlew build
-* Run the MrMapServer:
-* ./gradlew run -PchooseMain=io.grpc.filesystem.task3.MrMapServer --args="50551"
 */
 
 package io.grpc.filesystem.task3;

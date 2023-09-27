@@ -1,11 +1,5 @@
 /* 
 * Client program to request for map and reduce functions from the Server
-* To build the project:
-* cd path/to/task3/folder
-* ./gradlew init
-* ./gradlew build
-* run the MrClient:
-* ./gradlew run -PchooseMain=io.grpc.filesystem.task3.MrClient --args="127.0.0.1 50551 50552 input/pigs.txt output/output-task3.txt"
 */
 
 package io.grpc.filesystem.task3;

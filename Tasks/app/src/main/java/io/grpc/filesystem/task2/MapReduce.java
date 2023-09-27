@@ -1,9 +1,7 @@
 /*
- * the MapReduce functionality implemeted in this program takes a single large text file to map i.e. split it into small chunks and then assign 1 to all the found words
+ * the MapReduce functionality implemented in this program takes a single large text file to map i.e. split it into small chunks and then assign 1 to all the found words
  * then reduces by adding count values to each unique words
- * To build: ./gradlew build
- * To run: ./gradlew run -PchooseMain=io.grpc.filesystem.task2.MapReduce --args="input/pigs.txt output/output-task2.txt"
- */
+*/
 
 package io.grpc.filesystem.task2;
 

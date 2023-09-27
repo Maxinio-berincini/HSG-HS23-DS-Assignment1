@@ -1,13 +1,6 @@
 
 /* 
 * gRPC server node to accept calls from the clients and serve based on the method that has been requested
-* To build the project:
-* cd path/to/task3/folder
-* ./gradlew init
-* ./gradlew build
-*
-* Run the MrReduceServer:
-* ./gradlew run -PchooseMain=io.grpc.filesystem.task3.MrReduceServer --args="50552"
 */
 
 package io.grpc.filesystem.task3;
