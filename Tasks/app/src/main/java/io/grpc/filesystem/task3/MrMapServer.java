@@ -67,6 +67,7 @@ public class MrMapServer {
                 }
                 @Override
                 public void onError(Throwable t) {
+                    responseObserver.onNext(MapOutput.newBuilder().setJobstatus(1).build());
                     responseObserver.onError(t);
                     System.out.println("Error onError: " + t.getMessage());
                 }
