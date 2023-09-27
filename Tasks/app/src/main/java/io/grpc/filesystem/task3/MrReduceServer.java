@@ -39,10 +39,11 @@ public class MrReduceServer {
     }
 
     static class MrReduceServerImpl extends AssignJobGrpc.AssignJobImplBase {
+        MapReduce mr = new MapReduce();
         @Override
         public void reduce(ReduceInput request, StreamObserver<ReduceOutput> responseObserver) {
             try {
-                MapReduce.reduce(request.getInputfilepath(), request.getOutputfilepath());
+                mr.reduce(request.getInputfilepath(), request.getOutputfilepath());
 
                 ReduceOutput response = ReduceOutput.newBuilder().setJobstatus(2).build();
                 responseObserver.onNext(response);
