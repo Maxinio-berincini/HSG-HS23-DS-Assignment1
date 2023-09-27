@@ -31,7 +31,7 @@ import java.nio.charset.Charset;
 public class MrClient {
    Map<String, Integer> jobStatus = new HashMap<String, Integer>();
 
-   public  void requestMap(String ip, Integer portnumber, String inputfilepath, String outputfilepath) throws InterruptedException {
+   public void requestMap(String ip, Integer portnumber, String inputfilepath, String outputfilepath) throws InterruptedException {
       
       /* 
       * Insert your code here 
@@ -83,7 +83,7 @@ public class MrClient {
       Set<Integer> values = new HashSet<Integer>(client.jobStatus.values());
       if (values.size() == 1 && client.jobStatus.containsValue(2)) {
 
-         response = client.requestReduce(ip, reduceport, chunkpath + "/map", outputfilepath);
+         response = client.requestReduce(ip, reduceport, chunkpath, outputfilepath);
          if (response == 2) {
 
             System.out.println("Reduce task completed!");
