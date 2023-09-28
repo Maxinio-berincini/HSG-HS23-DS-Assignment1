@@ -54,15 +54,17 @@ public class MrMapServer {
                     System.out.println("Map: " + request.getInputfilepath());
                     try {
                         MapReduce.map(request.getInputfilepath());
-                        mapOutputStreamObserver.onNext(MapOutput.newBuilder().setJobstatus(2).build());
+                        System.out.println("Map: " + request.getInputfilepath() + " done");
+                        int chunkNumber = Integer.parseInt(new File(request.getInputfilepath()).getName().substring(5, 8));
+                        mapOutputStreamObserver.onNext(MapOutput.newBuilder().setJobstatus(chunkNumber).build());
                     } catch (IOException e) {
                         System.err.println("Error during map operation: " + e.getMessage());
-                        mapOutputStreamObserver.onNext(MapOutput.newBuilder().setJobstatus(1).build());
+                        mapOutputStreamObserver.onNext(MapOutput.newBuilder().setJobstatus(-1).build());
                     }
                 }
                 @Override
                 public void onError(Throwable t) {
-                    mapOutputStreamObserver.onNext(MapOutput.newBuilder().setJobstatus(1).build());
+                    // mapOutputStreamObserver.onNext(MapOutput.newBuilder().setJobstatus(1).build());
                     mapOutputStreamObserver.onError(t);
                     System.out.println("Error onError: " + t.getMessage());
                 }

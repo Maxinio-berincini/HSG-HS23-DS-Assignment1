@@ -47,10 +47,12 @@ public class MrReduceServer {
                 System.out.println(request.getOutputfilepath());
                 mr.reduce(request.getInputfilepath(), request.getOutputfilepath());
 
-                ReduceOutput response = ReduceOutput.newBuilder().setJobstatus(Integer.parseInt(request.getOutputfilepath().substring(10))).build();
+                System.out.println("Reduce: " + request.getInputfilepath() + " done");
+
+                ReduceOutput response = ReduceOutput.newBuilder().setJobstatus(2).build();
                 responseObserver.onNext(response);
             } catch (Exception e) {
-                ReduceOutput response = ReduceOutput.newBuilder().setJobstatus(-1).build();
+                ReduceOutput response = ReduceOutput.newBuilder().setJobstatus(1).build();
                 responseObserver.onNext(response);
             }
             responseObserver.onCompleted();

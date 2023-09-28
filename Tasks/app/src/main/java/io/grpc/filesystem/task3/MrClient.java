@@ -34,23 +34,27 @@ public class MrClient {
 
       AssignJobGrpc.AssignJobStub stub = AssignJobGrpc.newStub(channel);
 
+      // final CountDownLatch latch = new CountDownLatch(1);
+
       StreamObserver<MapInput> mapInputObserver = stub.map(new StreamObserver<MapOutput>() {
          @Override
          public void onNext(MapOutput value) {
             System.out.println("MapStatus: " + Integer.toString(value.getJobstatus()));
             if (value.getJobstatus() != -1) {
-               jobStatus.put("chunk" + Integer.toString(value.getJobstatus()) + ".txt", 2);
+               System.out.println("MapStatusUpdate: " + String.format("chunk%03d.txt", value.getJobstatus()));
+               jobStatus.put(outputfilepath + "/" + String.format("chunk%03d.txt", value.getJobstatus()), 2);
             }
          }
 
          @Override
          public void onError(Throwable t) {
-        System.err.println("Error received from server: " + t.getMessage());
+            System.out.println("Error received from server: " + t.getMessage());
          }
 
          @Override
          public void onCompleted() {
-            channel.shutdown();
+            channel.shutdownNow();
+            System.out.println("Map task completed!");
          }
       });
 
@@ -58,14 +62,21 @@ public class MrClient {
       System.out.println(outputfilepath);
       File tempDir = new File(outputfilepath);
       for (File file : tempDir.listFiles()) {
-          String inputFilePath = file.getAbsolutePath();
-          MapInput mapInput = MapInput.newBuilder()
-              .setInputfilepath(inputFilePath)
-              .build();
-          System.out.println("MapProcessing: " + file.getName());
-          mapInputObserver.onNext(mapInput);
+         System.out.println("Map: " + file.getName());
+         if (file.isFile() && (file.getName().equals("chunk001.txt"))) {
+            System.out.println("MapProcessing: " + file.getName());
+            String inputFilePath = file.getAbsolutePath();
+            MapInput mapInput = MapInput.newBuilder()
+                    .setInputfilepath(inputFilePath)
+                    .setOutputfilepath(outputfilepath)
+                    .setIp(ip)
+                    .setPort(portnumber)
+                    .build();
+            mapInputObserver.onNext(mapInput);
+         }
       }
-      mapInputObserver.onCompleted();
+        mapInputObserver.onCompleted();
+      channel.awaitTermination(20, TimeUnit.SECONDS);
    }
 
    public int requestReduce(String ip, Integer portnumber, String inputfilepath, String outputfilepath) {
@@ -94,8 +105,10 @@ public class MrClient {
       File[] directoyListing = dir.listFiles();
       if (directoyListing != null) {
          for (File f : directoyListing) {
-            if (f.isFile()) {
+            // only allow filenames: chuck001.txt and chunk002.txt
+            if (f.isFile() && (f.getName().equals("chunk001.txt"))) {
                noofjobs += 1;
+               System.out.println("Chunk: " + f.getPath());
                client.jobStatus.put(f.getPath(), 1);
 
             }
@@ -105,6 +118,12 @@ public class MrClient {
       client.requestMap(ip, mapport, inputfilepath, chunkpath);
 
       Set<Integer> values = new HashSet<Integer>(client.jobStatus.values());
+
+      // Print the unique values
+      for (Integer value : values)
+         System.out.println("Unique values: " + value);
+
+
       if (values.size() == 1 && client.jobStatus.containsValue(2)) {
 
          response = client.requestReduce(ip, reduceport, chunkpath, outputfilepath);
