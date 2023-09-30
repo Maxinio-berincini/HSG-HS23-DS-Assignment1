@@ -43,41 +43,36 @@ public class MrMapServer {
     static class MrMapServerImpl extends AssignJobGrpc.AssignJobImplBase {
         MapReduce mr = new MapReduce();
 
-        public StreamObserver<MapInput> map(MapInput request, StreamObserver<MapOutput> responseObserver) {
+        @Override
+        public StreamObserver<MapInput> map(StreamObserver<MapOutput> mapOutputStreamObserver) {
+
+            System.out.println("NewMap");
 
             return new StreamObserver<MapInput> () {
                 @Override
                 public void onNext(MapInput request) {
-                    File chunkFolder = new File(request.getInputfilepath());
-
-                    File[] directoyListing = chunkFolder.listFiles();
-                    if (directoyListing != null) {
-                        for (File f : directoyListing) {
-                            if (f.isFile()) {
-                                try {
-                                    MapReduce.map(f.getPath());
-                                    responseObserver.onNext(MapOutput.newBuilder().setJobstatus(2).build());
-                                } catch (IOException e) {
-                                    System.err.println("Error during map operation: " + e.getMessage());
-                                    responseObserver.onNext(MapOutput.newBuilder().setJobstatus(1).build());
-                                }
-                            }
-                        }
+                    System.out.println("Map: " + request.getInputfilepath());
+                    try {
+                        MapReduce.map(request.getInputfilepath());
+                        System.out.println("Map: " + request.getInputfilepath() + " done");
+                        int chunkNumber = Integer.parseInt(new File(request.getInputfilepath()).getName().substring(5, 8));
+                        mapOutputStreamObserver.onNext(MapOutput.newBuilder().setJobstatus(chunkNumber).build());
+                    } catch (IOException e) {
+                        System.err.println("Error during map operation: " + e.getMessage());
+                        mapOutputStreamObserver.onNext(MapOutput.newBuilder().setJobstatus(-1).build());
                     }
                 }
                 @Override
                 public void onError(Throwable t) {
-                    responseObserver.onNext(MapOutput.newBuilder().setJobstatus(1).build());
-                    responseObserver.onError(t);
+                    // mapOutputStreamObserver.onNext(MapOutput.newBuilder().setJobstatus(1).build());
+                    mapOutputStreamObserver.onError(t);
                     System.out.println("Error onError: " + t.getMessage());
                 }
                 @Override
                 public void onCompleted() {
-                    responseObserver.onCompleted();
+                    mapOutputStreamObserver.onCompleted();
                 }
             };
-
-
         }
     }
 

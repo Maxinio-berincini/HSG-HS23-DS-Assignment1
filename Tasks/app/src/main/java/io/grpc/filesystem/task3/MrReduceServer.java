@@ -43,7 +43,11 @@ public class MrReduceServer {
         @Override
         public void reduce(ReduceInput request, StreamObserver<ReduceOutput> responseObserver) {
             try {
+                System.out.println(request.getInputfilepath());
+                System.out.println(request.getOutputfilepath());
                 mr.reduce(request.getInputfilepath(), request.getOutputfilepath());
+
+                System.out.println("Reduce: " + request.getInputfilepath() + " done");
 
                 ReduceOutput response = ReduceOutput.newBuilder().setJobstatus(2).build();
                 responseObserver.onNext(response);
