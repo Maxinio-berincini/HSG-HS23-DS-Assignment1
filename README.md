@@ -1,25 +1,3 @@
-# LATEST BRANCH AND ISSUE DESCRIPTION
-
-**The most up to date branch is dev-MrClient**. 
-
-The program consists of two servers (one for map and one for reduce) and one client, as per the specifications provided.
-
-The issue arises when the client sends the second chunk to the Map server. Upon receiving the second chunk, the server logs a warning indicating "Too many responses" and subsequently sends an error. Below is a snippet of the server output that demonstrates the problem:
-
-> Listening on: 50551
-> Map: /home/leon/St.Gallen/HSG/Module/Sem3/Distributed_Systems/Assignments/HSG-HS23-DS-Assignment1/Tasks/app/input/temp/chunk001.txt
-> Map: /home/leon/St.Gallen/HSG/Module/Sem3/Distributed_Systems/Assignments/HSG-HS23-DS-Assignment1/Tasks/app/input/temp/chunk001.txt done
-> Map: /home/leon/St.Gallen/HSG/Module/Sem3/Distributed_Systems/Assignments/HSG-HS23-DS-Assignment1/Tasks/app/input/temp/chunk002.txt
-> Map: /home/leon/St.Gallen/HSG/Module/Sem3/Distributed_Systems/Assignments/HSG-HS23-DS-Assignment1/Tasks/app/input/temp/chunk002.txt done
-> 
-> io.grpc.internal.ServerCallImpl internalClose
-> WARNING: Cancelling the stream with status Status{code=INTERNAL, description=Too many responses, cause=null}
-> Error onError: CANCELLED: client cancelled
-
-The corresponding error on the client side is as follows:
-
-> Error received from server: CANCELLED: client cancelled
-
 # Map Reduce and gRPC
 
 The repository contains a gradle applications project template for completing task 2 and 3 for Assignment number 1.
