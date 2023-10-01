@@ -82,7 +82,6 @@ public class MapReduce {
                     // remove punctuation and convert to lowercase
                     word = word.replaceAll("\\p{Punct}", "").toLowerCase();
                     if (word.matches("^[a-zA-Z0-9]*$") && !word.isEmpty()) {
-                        //writer.write(word + ":1\n");
                         mapperList.add(new Mapper<>(word, 1));
                     } else {
                         System.out.println(word);

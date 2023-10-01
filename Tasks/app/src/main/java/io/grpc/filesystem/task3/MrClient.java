@@ -50,7 +50,7 @@ public class MrClient {
          }
 
          @Override
-         public void onCompleted () {
+         public void onCompleted() {
             channel.shutdownNow();
             System.out.println("Map task completed!");
          }
