@@ -70,6 +70,7 @@ public class MapReduce {
         new File(tempMapFolder).mkdirs();
         String tempMapFileName = "map-" + inputFile.getName();
         File tempMapFile = new File(tempMapFolder, tempMapFileName);
+        List<Mapper<String, Integer>> mapperList = new ArrayList<>(); //list of key-value pairs
 
         try (BufferedReader reader = new BufferedReader(new FileReader(inputFile));
              BufferedWriter writer = new BufferedWriter(new FileWriter(tempMapFile))) {
@@ -81,11 +82,16 @@ public class MapReduce {
                     // remove punctuation and convert to lowercase
                     word = word.replaceAll("\\p{Punct}", "").toLowerCase();
                     if (word.matches("^[a-zA-Z0-9]*$") && !word.isEmpty()) {
-                        writer.write(word + ":1\n");
+                        //writer.write(word + ":1\n");
+                        mapperList.add(new Mapper<>(word, 1));
                     } else {
                         System.out.println(word);
                     }
                 }
+            }
+            // write key-value pairs to file
+            for (Mapper<String, Integer> mapper : mapperList) {
+                writer.write(mapper.getWord() + ":" + mapper.getValue() + "\n");
             }
         }
 
