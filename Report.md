@@ -15,8 +15,8 @@ Assignment 1
 1. (0.25pt) What are Interface Definition Languages (IDL) used for? Name and explain the IDL that you use for this task.
    >Ans: 
    > 
-   > Interface Definition Languages are used to communicate between two programs, where the sender and receiver are not written in the same programming language.
-   > For the tasks above we used gRPC as the framework, which in turn uses Protocol Buffers as the IDL. We used it to define message types and then generate parts of the server and client code.  
+   > Interface Definition Languages are used for programming language agnostic communication between programs.
+   > For this assignment we used gRPC as the framework, which uses Protocol Buffers as the IDL. We used it to define message types and then generate parts of the server and client code.  
 2. (0.25pt) In this implementation of gRPC, you use channels. What are they used for?
    >Ans: 
    > 
@@ -27,9 +27,8 @@ Assignment 1
    (0.25) Can this programming model be suitable (recommended) for iterative machine learning or data analysis applications? Please explain your argument.
    >Ans: 
    > 
-   > During the Map part, the input is divided into multiple chunks. Each chunk is then process by a mapping function, that creates a list of all words and the occurrence of said word.
-   > The produced map is then saved in a temporary file. In the Reduce part, the previously created maps are summed up and saved as a single map. 
+   > As the name implies the MapReduce algorithm is seperated into 2 parts: Map and Reduce. During the map phase, the input is divided into chunks by a mapping function. This intermediary output is stored in temporary files. During the reduce phase, the data from the files is consolidated and the result is the final output.
    >
-   >Yes I think every program that relies on a connection can have some latency depending on the network load and speed and the overhead that is created when scheduling tasks and splitting the data.
+   >Yes we think every program that relies on a connection can have some latency depending on the network load and the overhead that is created when scheduling tasks and splitting the data. Saving the chunks as an intermediary step between map and reduce also introduces additional delay.
    > 
-   >I dont think that it is suitable for big iterative tasks in general, as there is a lot of data, that has to be processed multiple times, while there is each time some latency from the overhead mentioned above and the network setup.
+   > When it comes to iterative tasks, especially in domains like machine learning or complex data analysis, MapReduce is not optimal. With each iteration, the overhead of MapReduce explained previously compounds, which makes it impractical on a large scale.
